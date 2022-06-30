@@ -20,26 +20,27 @@ public class EmulatorMobileDriver implements WebDriverProvider {
 
     @Override
     public WebDriver createDriver(Capabilities capabilities) {
-
         File app = getApp();
 
         UiAutomator2Options options = new UiAutomator2Options();
         options.merge(capabilities);
         options.setAutomationName(AutomationName.ANDROID_UIAUTOMATOR2);
         options.setPlatformName("Android");
-        options.setDeviceName("Pixel_4_API_30");
-        options.setPlatformName("11.0");
+        options.setDeviceName("RFCR90ZMNQP");
+//        options.setDeviceName("Pixel_4_API_30");
+        options.setPlatformVersion("11.0");
         options.setApp(app.getAbsolutePath());
+        options.setLocale("en");
+        options.setLanguage("en");
         options.setAppPackage("org.wikipedia.alpha");
         options.setAppActivity("org.wikipedia.main.MainActivity");
 
-        return new AndroidDriver(getAppiumServerURL(), options);
-
+        return new AndroidDriver(getAppiumServerUrl(), options);
     }
 
-    public static URL getAppiumServerURL() {
+    public static URL getAppiumServerUrl() {
         try {
-            return new URL("https://localhost:4723/wd/hub");
+            return new URL("http://localhost:4723/wd/hub");
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -47,13 +48,15 @@ public class EmulatorMobileDriver implements WebDriverProvider {
 
     private File getApp() {
         String appPath = "src/test/resources/apk/app-alpha-universal-release.apk";
-        String appUrl = "https://github.com/wikimedia/apps-android-wikipedia/releases/download/latest/app-alpha-universal-release.apk";
+        String appUrl = "https://github.com/wikimedia/apps-android-wikipedia/" +
+                "releases/download/latest/app-alpha-universal-release.apk?raw=true";
 
         File app = new File(appPath);
         if (!app.exists()) {
             try (InputStream in = new URL(appUrl).openStream()) {
                 copyInputStreamToFile(in, app);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new AssertionError("Failed to download apk", e);
             }
         }
